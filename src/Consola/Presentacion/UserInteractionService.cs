@@ -1,4 +1,4 @@
-using Application.Common.Interface.Presentation;
+﻿using Application.Common.Interface.Presentation;
 
 public class ConsoleUserInteractionService : IUserInteractionService
 {
@@ -22,13 +22,30 @@ public class ConsoleUserInteractionService : IUserInteractionService
 
             if (!int.TryParse(input, out result) || result < minValue || result > maxValue)
             {
-                ShowMessage($"Error: Ingrese un n�mero v�lido entre {minValue} y {maxValue}.");
+                ShowMessage($"Error: Ingrese un número válido entre {minValue} y {maxValue}.");
                 continue;
             }
 
             break;
         } while (true);
 
+        return result;
+    }
+
+    public decimal GetValidatedDecimalMaxMin(string message, decimal minValue, decimal maxValue)
+    {
+        decimal result;
+        do
+        {
+            ShowMessage(message);
+            var input = Console.ReadLine();
+            if (!decimal.TryParse(input, out result) || result < minValue || result > maxValue)
+            {
+                ShowMessage($"Error: Ingrese un número válido entre {minValue} y {maxValue}.");
+                continue;
+            }
+            break;
+        } while (true);
         return result;
     }
 }

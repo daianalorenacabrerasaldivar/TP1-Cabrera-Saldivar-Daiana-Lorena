@@ -1,4 +1,4 @@
-using Application.Common.Interface.Presentation;
+﻿using Application.Common.Interface.Presentation;
 
 public class MenuFactory
 {
@@ -48,6 +48,12 @@ public class MenuFactory
    //     { "6", new MenuOption { Description = "Cambiar de usuario", Command = commands.OfType<UserSessionCommand>().FirstOrDefault() } },
    //     { "7", new MenuOption { Description = "Salir", Command = commands.OfType<ExitCommand>().FirstOrDefault() } }
    // };
+
+    Dictionary<string,IMenuOptionCommand> menus= new Dictionary<string, IMenuOptionCommand>()
+    //{ { "1", commands.OfType<CreateProjectCommand>().FirstOrDefault() } },
+       
+    };
+    
 
 }
 public class MenuOption
