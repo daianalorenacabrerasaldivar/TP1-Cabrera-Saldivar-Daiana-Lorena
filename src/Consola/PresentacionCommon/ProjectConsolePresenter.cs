@@ -4,7 +4,7 @@ using Consola.Helpers;
 using Domain.Dto;
 using Domain.Entity;
 
-namespace Consola.Presentacion
+namespace Consola.PresentacionCommon
 {
     public class ProjectConsolePresenter : IProjectConsolePresenter
     {

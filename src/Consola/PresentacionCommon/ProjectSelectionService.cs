@@ -3,7 +3,7 @@ using Application.UseCase.ProjectProposals.Querys.FilterParameter;
 using Application.UseCase.ProjectProposals.Querys.ProjectById;
 using MediatR;
 
-namespace Application.Service
+namespace Consola.PresentacionCommon
 {
     public class ProjectSelectionService : IProjectSelectionService
     {

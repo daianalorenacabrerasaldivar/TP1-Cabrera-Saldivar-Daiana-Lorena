@@ -20,9 +20,15 @@ namespace Infrastructure.Persistencia.Repositories.Query.Project
             try
             {
                 var result = await _repository.Query<ProjectProposal>()
-                    .Include(p => p.AreaEntity)
-                    .Include(p => p.TypeEntity)
-                    .Include(p => p.ApprovalStatus)
+                .Include(x => x.AreaEntity)
+                .Include(x => x.TypeEntity)
+                .Include(x => x.ApprovalStatus)
+                .Include(x => x.ApprovalSteps)
+                    .ThenInclude(x => x.ApproverUser)
+                .Include(x => x.ApprovalSteps)
+                    .ThenInclude(x => x.ApproverRole)
+                .Include(x => x.ApprovalSteps)
+                    .ThenInclude(x => x.ApprovalStatus)
                     .FirstOrDefaultAsync(p => p.Id == id);
                 return new Success<ProjectProposal>(result);
             }

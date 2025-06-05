@@ -1,4 +1,4 @@
-using Application.Common.Interface.Infrastructure;
+﻿using Application.Common.Interface.Infrastructure;
 using Domain.Dto;
 using Domain.Entity;
 using MediatR;
@@ -8,18 +8,25 @@ namespace Application.UseCase.Users.Queries
 {
     public class GetAllUsersQueryHandler : IRequestHandler<GetAllUsersQuery, List<UserDto>>
     {
-        private readonly IRepositoryQuery _repositoryQuery;
+        private readonly IUserQuery _repositoryQuery;
 
-        public GetAllUsersQueryHandler(IRepositoryQuery repositoryQuery)
+        public GetAllUsersQueryHandler(IUserQuery repositoryQuery)
         {
             _repositoryQuery = repositoryQuery;
         }
 
         public async Task<List<UserDto>> Handle(GetAllUsersQuery request, CancellationToken cancellationToken)
         {
-            var users = await _repositoryQuery.Query<User>()
-                .Include(u => u.ApproverRole)
-                .Select(user => new UserDto
+            try
+            {
+                var usersResult = await _repositoryQuery.GetAllUsers();
+
+                if (usersResult == null || usersResult.IsFailed || !usersResult.Value.Any())
+                {
+                    return new List<UserDto>();
+                }
+                var users = usersResult.Value;
+                var userDtos = users.Select(user => new UserDto
                 {
                     Id = user.Id,
                     Name = user.Name,
@@ -29,13 +36,14 @@ namespace Application.UseCase.Users.Queries
                         Id = user.Role,
                         Name = user.ApproverRole.Name
                     }
-                })
-                .ToListAsync(cancellationToken);
+                }).ToList();
 
-            if (!users.Any())
-                users = new List<UserDto>();
-
-            return users;
+                return userDtos;
+            }
+            catch (Exception ex)
+            {
+                return new List<UserDto>();
+            }
         }
     }
 }

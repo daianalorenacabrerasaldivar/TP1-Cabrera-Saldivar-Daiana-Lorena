@@ -2,7 +2,7 @@
 using Domain.Entity;
 using Domain.Enum;
 
-namespace Infrastructure.Persistencia.Repositories.Query.Steps
+namespace Infrastructure.Persistencia.Repositories.Query.AprovalRules
 {
     public class ApprovalStepUpdater : IApprovalStepUpdater
     {

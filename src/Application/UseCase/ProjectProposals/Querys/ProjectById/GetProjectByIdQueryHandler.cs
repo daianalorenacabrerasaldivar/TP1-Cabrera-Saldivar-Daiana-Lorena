@@ -1,4 +1,4 @@
-using Application.Common.Interface.Infrastructure;
+﻿using Application.Common.Interface.Infrastructure;
 using Application.Mapper;
 using Domain.Dto;
 using Domain.Entity;
@@ -9,29 +9,19 @@ namespace Application.UseCase.ProjectProposals.Querys.ProjectById
 {
     public class GetProjectByIdQueryHandler : IRequestHandler<GetProjectByIdQuery, ProjectProposalResponse>
     {
-        private readonly IRepositoryQuery _repositoryQuery;
+        private readonly IProjectProposalQuery _projectProposalQuery;
 
-        public GetProjectByIdQueryHandler(IRepositoryQuery repositoryQuery)
+        public GetProjectByIdQueryHandler(IProjectProposalQuery projectProposalQuery)
         {
-            _repositoryQuery = repositoryQuery;
+            _projectProposalQuery = projectProposalQuery;
         }
 
         public async Task<ProjectProposalResponse> Handle(GetProjectByIdQuery request, CancellationToken cancellationToken)
         {
-            var proposal = await _repositoryQuery.Query<ProjectProposal>()
-                .Include(x => x.AreaEntity)
-                .Include(x => x.TypeEntity)
-                .Include(x => x.ApprovalStatus)
-                .Include(x => x.ApprovalSteps)
-                    .ThenInclude(x => x.ApproverUser)
-                .Include(x => x.ApprovalSteps)
-                    .ThenInclude(x => x.ApproverRole)
-                .Include(x => x.ApprovalSteps)
-                    .ThenInclude(x => x.ApprovalStatus)
-                .FirstOrDefaultAsync(x => x.Id == request.Id);
+            var proposal = await _projectProposalQuery.GetProjectProposalByIdAsync(request.Id);
 
             if (proposal == null)
-                throw new ArgumentException($"No se encontr� el proyecto con ID: {request.Id}");
+                throw new ArgumentException($"No se encontró el proyecto con ID: {request.Id}");
 
             return MapperProposal.MapToProposalResponse(proposal);
         }

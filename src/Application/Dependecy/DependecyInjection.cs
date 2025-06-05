@@ -17,7 +17,7 @@ namespace Application.Dependecy
 
             services.AddScoped<ICreateProjectProposalService, CreateProjectProposalService>();
             services.AddScoped<IApprovalAssignmentService, ProjectApprovalAssignmentRuleService>();
-            services.AddScoped<IProjectValidatorCanUpdateStatus, ProjectValidatorCanUpdateStatus>();
+            services.AddScoped<IProjectApprovalStepUpdateValidator, ProjectApprovalStepUpdateValidator>();
             services.AddScoped<IProjectProposalBusinessValidator, ProjectProposalBusinessValidator>();
         }
     }

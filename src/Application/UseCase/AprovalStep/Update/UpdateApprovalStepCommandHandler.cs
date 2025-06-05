@@ -6,7 +6,6 @@ using Domain.Dto;
 using Domain.Entity;
 using Domain.Enum;
 using MediatR;
-using Microsoft.EntityFrameworkCore;
 using System.Net;
 
 namespace Application.UseCase.AprovalStep.Update
@@ -14,14 +13,12 @@ namespace Application.UseCase.AprovalStep.Update
     public class UpdateApprovalStepCommandHandler : IRequestHandler<UpdateApprovalStepCommand, ResponseCodeAndObject<ProjectProposalResponse>>
     {
         private readonly IRepositoryCommand _repositoryCommand;
-        private readonly IRepositoryQuery _repositoryQuery;
-        private readonly IProjectValidatorCanUpdateStatus _projectValidatorCanUpdateStatus;
+        private readonly IProjectApprovalStepUpdateValidator _projectValidatorCanUpdateStatus;
         private readonly IProjectProposalQuery _projectProposalQuery;
-
-        public UpdateApprovalStepCommandHandler(IRepositoryCommand repositoryCommand, IRepositoryQuery repositoryQuery, IProjectValidatorCanUpdateStatus projectValidatorCanUpdateStatus)
+        public UpdateApprovalStepCommandHandler(IRepositoryCommand repositoryCommand, IProjectProposalQuery projectTypeQuery, IProjectApprovalStepUpdateValidator projectValidatorCanUpdateStatus)
         {
             _repositoryCommand = repositoryCommand;
-            _repositoryQuery = repositoryQuery;
+            _projectProposalQuery = projectTypeQuery;
             _projectValidatorCanUpdateStatus = projectValidatorCanUpdateStatus;
         }
 
@@ -31,31 +28,46 @@ namespace Application.UseCase.AprovalStep.Update
             if (validatio.IsFailed)
                 throw new ArgumentException(validatio.Info);
 
-            var projectId = request.ProjectId;
-            var projectProposal =await _projectProposalQuery.GetProjectProposalByIdAsync(projectId);
-                
-            if (projectProposal == null)
+            var projectProposalResult = await _projectProposalQuery.GetProjectProposalByIdAsync(request.ProjectId);
+
+            if (projectProposalResult.IsFailed)
+            {
+                return new ResponseCodeAndObject<ProjectProposalResponse>
+                {
+                    Message = projectProposalResult.Info,
+                    httpStatusCode = HttpStatusCode.InternalServerError
+                };
+            }
+            else if (projectProposalResult.Value == null)
             {
                 return new ResponseCodeAndObject<ProjectProposalResponse>
                 {
 
-                    Message = "Proyecto no encontrado"
+                    Message = "Proyecto no encontrado",
+                    httpStatusCode = HttpStatusCode.NotFound
                 };
             }
-            var approvalStep = _repositoryQuery.Query<ProjectApprovalStep>()
-            .FirstOrDefault(x => x.ProjectProposalId == projectId && x.Id == request.StepId);
-            if (approvalStep == null)
-                throw new ArgumentException("Paso de aprobación no encontrado");
 
-
-            var isCanUpdateStatus = _projectValidatorCanUpdateStatus.CanUpdateStatus(projectProposal, approvalStep, request);
-            if (isCanUpdateStatus.IsFailed || !isCanUpdateStatus.Value)
+            var ApprovalStepResul = await _projectValidatorCanUpdateStatus.TryGetUpdatableApprovalStepAsync(projectProposalResult, request);
+            if (ApprovalStepResul.IsFailed)
                 return new ResponseCodeAndObject<ProjectProposalResponse>
                 {
-                    Message = isCanUpdateStatus.Info,
+                    Message = ApprovalStepResul.Info,
                     httpStatusCode = HttpStatusCode.Conflict
                 };
+   
+            var resultProject = await UpdateProposalAndStepAsync(projectProposalResult.Value, ApprovalStepResul.Value, request);
 
+            var mapper = MapperProposal.MapToProposalResponse(resultProject);
+            return new ResponseCodeAndObject<ProjectProposalResponse>
+            {
+                Response = mapper,
+                httpStatusCode = HttpStatusCode.OK,
+            };
+        }
+        private async Task<ProjectProposal> UpdateProposalAndStepAsync(ProjectProposal projectProposal,ProjectApprovalStep approvalStep, UpdateApprovalStepCommand request)
+        {
+           
             approvalStep.Status = request.Status;
             approvalStep.ApproverUserId = request.UserId;
             approvalStep.Observations = request.Observation;
@@ -67,18 +79,19 @@ namespace Application.UseCase.AprovalStep.Update
                 projectProposal.Status = (int)StatusEnum.Rejected;
                 _repositoryCommand.Update(projectProposal);
             }
-
+            else if (AreAllStepsApproved(projectProposal))
+            {
+                projectProposal.Status = (int)StatusEnum.Approved;
+            }
 
             var result = await _repositoryCommand.SaveAsync();
-
-            var mapper = MapperProposal.MapToProposalResponse(projectProposal);
-            return new ResponseCodeAndObject<ProjectProposalResponse>
-            {
-                Response = mapper,
-                httpStatusCode = HttpStatusCode.OK,
-            };
+            return projectProposal;
         }
 
+        private bool AreAllStepsApproved(ProjectProposal project)
+        {
+            return project.ApprovalSteps.All(step => step.Status == (int)StatusEnum.Approved);
+        }
 
     }
 }

@@ -1,4 +1,4 @@
-namespace ApprovalManagerConsole.Menu
+﻿namespace Consola.Menu
 {
     public class MenuManagerHandler
     {

@@ -6,7 +6,7 @@ using Application.UseCase.ProjectTypes.Queries;
 using Domain.Dto;
 using MediatR;
 
-namespace ApprovalManagerConsole.Menu.CreateProject
+namespace Consola.Menu.CommandMenu.CreateProject
 {
     public class CreateProjectConsoleAction : IMenuOptionCommand
     {

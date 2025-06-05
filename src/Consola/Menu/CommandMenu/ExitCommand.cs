@@ -1,6 +1,6 @@
 ﻿using Application.Common.Interface.Presentation;
 
-namespace ApprovalManagerConsole.Menu.Commands
+namespace Consola.Menu.CommandMenu
 {
     internal class ExitCommand : IMenuOptionCommand
     {
