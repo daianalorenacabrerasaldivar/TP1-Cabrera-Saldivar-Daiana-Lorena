@@ -38,20 +38,20 @@ public class MenuFactory
     //};
     //}
 
-   //Dictionary<> menus= new Dictionary<string, MenuOption>
-   // {
-   //     { "1", new MenuOption {Description = "Crear un nuevo proyecto", Command = commands.OfType<CreateProjectCommand>().FirstOrDefault() } },
-   //     { "2", new MenuOption { Description = "Aprobar un proyecto", Command = commands.OfType<ApproveProjectCommand>().FirstOrDefault() } },
-   //     { "3", new MenuOption { Description = "Ver mis proyectos", Command = commands.OfType<ShowMyProjectsCommand>().FirstOrDefault() } },
-   //     { "4", new MenuOption { Description = "Ver proyectos aprobados", Command = commands.OfType<ShowApprovedProjectsCommand>().FirstOrDefault() } },
-   //     { "5", new MenuOption { Description = "Ver proyectos rechazados", Command = commands.OfType<ShowRejectedProjectsCommand>().FirstOrDefault() } },
-   //     { "6", new MenuOption { Description = "Cambiar de usuario", Command = commands.OfType<UserSessionCommand>().FirstOrDefault() } },
-   //     { "7", new MenuOption { Description = "Salir", Command = commands.OfType<ExitCommand>().FirstOrDefault() } }
-   // };
+    //Dictionary<> menus= new Dictionary<string, MenuOption>
+    // {
+    //     { "1", new MenuOption {Description = "Crear un nuevo proyecto", Command = commands.OfType<CreateProjectCommand>().FirstOrDefault() } },
+    //     { "2", new MenuOption { Description = "Aprobar un proyecto", Command = commands.OfType<ApproveProjectCommand>().FirstOrDefault() } },
+    //     { "3", new MenuOption { Description = "Ver mis proyectos", Command = commands.OfType<ShowMyProjectsCommand>().FirstOrDefault() } },
+    //     { "4", new MenuOption { Description = "Ver proyectos aprobados", Command = commands.OfType<ShowApprovedProjectsCommand>().FirstOrDefault() } },
+    //     { "5", new MenuOption { Description = "Ver proyectos rechazados", Command = commands.OfType<ShowRejectedProjectsCommand>().FirstOrDefault() } },
+    //     { "6", new MenuOption { Description = "Cambiar de usuario", Command = commands.OfType<UserSessionCommand>().FirstOrDefault() } },
+    //     { "7", new MenuOption { Description = "Salir", Command = commands.OfType<ExitCommand>().FirstOrDefault() } }
+    // };
 
-    Dictionary<string,IMenuOptionCommand> menus= new Dictionary<string, IMenuOptionCommand>()
+    Dictionary<string, IMenuOptionCommand> menus = new Dictionary<string, IMenuOptionCommand>();
     //{ { "1", commands.OfType<CreateProjectCommand>().FirstOrDefault() } },
-       
+
     };
     
 

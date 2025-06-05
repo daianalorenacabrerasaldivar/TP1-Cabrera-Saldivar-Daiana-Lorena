@@ -1,4 +1,4 @@
-using Application.Common.Interface;
+﻿using Application.Common.Interface;
 using Application.Common.Interface.Infrastructure;
 using Application.Mapper;
 using Domain.Common;
@@ -16,6 +16,7 @@ namespace Application.UseCase.AprovalStep.Update
         private readonly IRepositoryCommand _repositoryCommand;
         private readonly IRepositoryQuery _repositoryQuery;
         private readonly IProjectValidatorCanUpdateStatus _projectValidatorCanUpdateStatus;
+        private readonly IProjectProposalQuery _projectProposalQuery;
 
         public UpdateApprovalStepCommandHandler(IRepositoryCommand repositoryCommand, IRepositoryQuery repositoryQuery, IProjectValidatorCanUpdateStatus projectValidatorCanUpdateStatus)
         {
@@ -29,11 +30,10 @@ namespace Application.UseCase.AprovalStep.Update
             var validatio = UpdateApprovalStepValidator.Validate(request);
             if (validatio.IsFailed)
                 throw new ArgumentException(validatio.Info);
-            var projectId = request.ProjectId;
-            var projectProposal = _repositoryQuery.Query<ProjectProposal>()
-                .Include(x => x.ApprovalSteps)
-                .FirstOrDefault(x => x.Id == projectId);
 
+            var projectId = request.ProjectId;
+            var projectProposal =await _projectProposalQuery.GetProjectProposalByIdAsync(projectId);
+                
             if (projectProposal == null)
             {
                 return new ResponseCodeAndObject<ProjectProposalResponse>
@@ -45,7 +45,7 @@ namespace Application.UseCase.AprovalStep.Update
             var approvalStep = _repositoryQuery.Query<ProjectApprovalStep>()
             .FirstOrDefault(x => x.ProjectProposalId == projectId && x.Id == request.StepId);
             if (approvalStep == null)
-                throw new ArgumentException("Paso de aprobaci�n no encontrado");
+                throw new ArgumentException("Paso de aprobación no encontrado");
 
 
             var isCanUpdateStatus = _projectValidatorCanUpdateStatus.CanUpdateStatus(projectProposal, approvalStep, request);

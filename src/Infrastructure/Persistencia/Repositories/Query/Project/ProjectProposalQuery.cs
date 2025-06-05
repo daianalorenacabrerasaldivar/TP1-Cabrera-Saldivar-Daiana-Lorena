@@ -2,9 +2,7 @@
 using Application.UseCase.ProjectProposals.Querys.FilterParameter;
 using Domain.Common.ResultPattern;
 using Domain.Entity;
-using Domain.Enum;
 using Microsoft.EntityFrameworkCore;
-using System.Linq.Expressions;
 
 namespace Infrastructure.Persistencia.Repositories.Query.Project
 {
@@ -17,7 +15,7 @@ namespace Infrastructure.Persistencia.Repositories.Query.Project
             _repository = repository ?? throw new ArgumentNullException(nameof(repository));
         }
 
-        public async Task<Result<ProjectProposal>> GetByIdWithDetails(Guid id)
+        public async Task<Result<ProjectProposal>> GetProjectProposalByIdAsync(Guid id)
         {
             try
             {
@@ -45,9 +43,9 @@ namespace Infrastructure.Persistencia.Repositories.Query.Project
                     query = query.Where(p => p.Title.Contains(filter.Title));
                 }
 
-                if (filter.Status.HasValue && filter.Status > 0)
+                if (filter.Status != null && filter.Status.Count > 0)
                 {
-                    query = query.Where(p => p.Status == filter.Status.Value);
+                    query = query.Where(p => filter.Status.Contains(p.Status));
                 }
 
                 if (filter.Applicant.HasValue && filter.Applicant > 0)
@@ -57,7 +55,20 @@ namespace Infrastructure.Persistencia.Repositories.Query.Project
 
                 if (filter.ApprovalUser.HasValue && filter.ApprovalUser > 0)
                 {
-                    query = query.Where(p => p.ApprovalSteps.Any(s => s.ApproverUser.Id == filter.ApprovalUser));
+                    var approverUserStep = _repository.Query<User>()
+                     .AsNoTracking()
+                     .FirstOrDefault(u => u.Id == filter.ApprovalUser);
+
+                    if (approverUserStep != null)
+                    {
+                        query = query.Where(p => p.ApprovalSteps
+                        .Any(
+                            step => step.ApproverUser == approverUserStep || //es aprobador
+                            (step.ApproverUser == null && step.ApproverRole == approverUserStep.ApproverRole) //es un rol de aprobador
+
+                        ));
+                    }
+
                 }
 
                 var result = await query
@@ -74,66 +85,6 @@ namespace Infrastructure.Persistencia.Repositories.Query.Project
             }
         }
 
-        public async Task<List<ProjectProposal>> GetAllProjectsForStatusAsync(int status)
-        {
-            return await _repository.Query<ProjectProposal>()
-                .Include(p => p.AreaEntity)
-                .Include(p => p.TypeEntity)
-                .Include(p => p.ApprovalStatus)
-                .Include(p => p.CreateBy)
-                .Include(p => p.ApprovalSteps)
-                .Where(p => p.Status == status)
-                .ToListAsync();
-        }
 
-        public async Task<List<ProjectProposal>> GetProjectsCreatedByUserAsync(int createdByUserId)
-        {
-            return await _repository.Query<ProjectProposal>()
-                .Include(p => p.AreaEntity)
-                .Include(p => p.TypeEntity)
-                .Include(p => p.ApprovalStatus)
-                .Include(p => p.User)
-                .Include(p => p.ApprovalSteps)
-                    .ThenInclude(s => s.ApproverRole)
-                .Include(p => p.ApprovalSteps)
-                    .ThenInclude(s => s.ApproverUser)
-                .Where(p => p.CreateBy == createdByUserId)
-                .ToListAsync();
-        }
-
-        public List<ProjectProposal> GetProjectForAprobation(User user)
-        {
-            var role = user.Role;
-            var filter = FilterPendingOrObservedSteps(role);
-
-            return _repository.Query<ProjectProposal>()
-                .AsNoTracking()
-                .Where(filter)
-                .Include(p => p.AreaEntity)
-                .Include(p => p.TypeEntity)
-                .Include(p => p.ApprovalStatus)
-                .Include(p => p.User)
-                .Include(p => p.ApprovalSteps)
-                    .ThenInclude(s => s.ApproverRole)
-                .Include(p => p.ApprovalSteps)
-                    .ThenInclude(s => s.ApproverUser)
-                .ToList();
-        }
-
-        private static Expression<Func<ProjectProposal, bool>> FilterPendingOrObservedSteps(int role)
-        {
-            return proposal => proposal.ApprovalSteps.Any(s =>
-                (s.Status == (int)StatusEnum.Pending || s.Status == (int)StatusEnum.Observed) &&
-                s.ApproverRoleId == role &&
-                (
-                    s.StepOrder == 1 ||
-                    proposal.ApprovalSteps.Any(previousStep =>
-                        previousStep.ProjectProposalId == s.ProjectProposalId &&
-                        previousStep.StepOrder == s.StepOrder - 1 &&
-                        previousStep.Status == (int)StatusEnum.Approved
-                    )
-                )
-            );
-        }
     }
 }

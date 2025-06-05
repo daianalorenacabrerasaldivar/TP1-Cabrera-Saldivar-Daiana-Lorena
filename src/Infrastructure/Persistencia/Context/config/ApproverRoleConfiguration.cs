@@ -1,4 +1,4 @@
-using Domain.Entity;
+Ôªøusing Domain.Entity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -16,10 +16,10 @@ namespace Infrastructure.Persistencia.Context.config
                 .HasMaxLength(25);
 
             builder.HasData(
-                 new ApproverRole { Id = 1, Name = "LÌder de ·rea" },
+                 new ApproverRole { Id = 1, Name = "L√≠der de √Årea" },
                  new ApproverRole { Id = 2, Name = "Gerente" },
                  new ApproverRole { Id = 3, Name = "Director" },
-                 new ApproverRole { Id = 4, Name = "ComitÈ TÈcnico" }
+                 new ApproverRole { Id = 4, Name = "Comit√© T√©cnico" }
             );
         }
     }

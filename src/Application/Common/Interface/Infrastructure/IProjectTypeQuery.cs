@@ -1,4 +1,4 @@
-﻿namespace Application.UsesCases.Query.ProjectTypes
+﻿namespace Application.Common.Interface.Infrastructure
 {
     public interface IProjectTypeQuery
     {

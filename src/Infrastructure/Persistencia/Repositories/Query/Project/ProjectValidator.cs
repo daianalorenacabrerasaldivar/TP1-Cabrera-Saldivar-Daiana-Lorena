@@ -1,5 +1,4 @@
-﻿using Application.Common.Interface;
-using Domain.Entity;
+﻿using Domain.Entity;
 using Domain.Enum;
 namespace Infrastructure.Persistencia.Repositories.Query.Project
 {

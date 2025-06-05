@@ -1,40 +1,33 @@
-using Application.Common.Interface;
-using Application.Common.Interface.Infrastructure;
+ï»¿using Application.Common.Interface;
 using Domain.Common.ResultPattern;
 using Domain.Entity;
 using Domain.Enum;
-using Microsoft.EntityFrameworkCore;
 namespace Application.Service.ProjectProposals;
 public class ProjectApprovalAssignmentRuleService : IApprovalAssignmentService
 {
-    private readonly IRepositoryQuery _queryRepository;
+    private readonly IApprovalRuleForProjectQuery _approvalRuleSelectorQuery;
 
-    public ProjectApprovalAssignmentRuleService(IRepositoryQuery queryRepository)
+    public ProjectApprovalAssignmentRuleService(IApprovalRuleForProjectQuery approvalRuleSelectorQuery)
     {
-        _queryRepository = queryRepository;
+        _approvalRuleSelectorQuery = approvalRuleSelectorQuery;
     }
 
     public async Task<Result<List<ProjectApprovalStep>>> GetApprovalStepsForProposalAsync(ProjectProposal proposal)
     {
-        var rules = await _queryRepository.Query<ApprovalRule>()
-             .Where(r =>
-            (r.MinAmount == 0 || proposal.EstimatedAmount >= r.MinAmount) &&
-            (r.MaxAmount == 0 || proposal.EstimatedAmount <= r.MaxAmount) &&
-            (r.AreaEntity == null || r.Area == proposal.Area) &&
-            (r.Type == null || r.Type == proposal.Type))
-            .OrderByDescending(rule => rule.Area != null && rule.Type != null)
-            // Dentro de las reglas igual de específicas, ordena por el orden del paso.
-            .ThenBy(rule => rule.StepOrder)
-            .ToListAsync();
 
+        var ruleAprovalResult = await _approvalRuleSelectorQuery.SelectBestApprovalRuleAsync(proposal);
+        if (ruleAprovalResult.IsFailed)
+            return new Failed<List<ProjectApprovalStep>>(ruleAprovalResult.Info);
+
+        var ruleAproval = ruleAprovalResult.Value;
         List<ProjectApprovalStep> steps = new List<ProjectApprovalStep>();
-        foreach (var rule in rules)
+        for (int i = 0; i < ruleAproval.StepOrder; i++)
         {
             var step = new ProjectApprovalStep
             {
                 ProjectProposalId = proposal.Id,
-                ApproverRoleId = rule.ApproverRoleId,
-                StepOrder = rule.StepOrder,
+                ApproverRoleId = ruleAproval.ApproverRoleId,
+                StepOrder = ruleAproval.StepOrder,
                 Status = (int)StatusEnum.Pending
             };
             steps.Add(step);

@@ -3,7 +3,6 @@ using Application.Common.Interface.Infrastructure;
 using Application.UseCase.ProjectProposals.Commands.Create;
 using Domain.Common.ResultPattern;
 using Domain.Entity;
-using Microsoft.EntityFrameworkCore;
 
 namespace Application.Service.ProjectProposals
 {
@@ -11,13 +10,13 @@ namespace Application.Service.ProjectProposals
     {
         private readonly IRepositoryCommand _repositoryCommand;
         private readonly IApprovalAssignmentService _approvalAssignmentService;
-        private readonly IRepositoryQuery _repositoryQuery;
+        private readonly IProjectProposalQuery _projectProposalQuery;
 
-        public CreateProjectProposalService(IRepositoryCommand repositoryCommand, IRepositoryQuery repositoryQuery, IApprovalAssignmentService approvalAssignmentService)
+        public CreateProjectProposalService(IRepositoryCommand repositoryCommand, IProjectProposalQuery projectProposalQuery, IApprovalAssignmentService approvalAssignmentService)
         {
             _repositoryCommand = repositoryCommand;
             _approvalAssignmentService = approvalAssignmentService;
-            _repositoryQuery = repositoryQuery;
+            _projectProposalQuery = projectProposalQuery;
         }
 
         public async Task<Result<ProjectProposal>> CreateProjectWithApprovalFlowAsync(CreateProjectProposalCommand projectProposal)
@@ -50,12 +49,8 @@ namespace Application.Service.ProjectProposals
             if (resultProject.IsFailed)
                 return new Failed<ProjectProposal>($"Error al guardar el proyecto.");
 
-            var projectProposalDetail = await _repositoryQuery.Query<ProjectProposal>()
-                .Include(p => p.AreaEntity)
-                .Include(p => p.TypeEntity)
-                .Include(p => p.ApprovalStatus)
-                .Include(p => p.User)
-                .FirstOrDefaultAsync(p => p.Id == createdProjectProposal.Id);
+
+            var projectProposalDetail = await _projectProposalQuery.GetProjectProposalByIdAsync(createdProjectProposal.Id);
             if (projectProposalDetail == null)
                 return new Failed<ProjectProposal>("No se encontró la propuesta de proyecto creada.");
 

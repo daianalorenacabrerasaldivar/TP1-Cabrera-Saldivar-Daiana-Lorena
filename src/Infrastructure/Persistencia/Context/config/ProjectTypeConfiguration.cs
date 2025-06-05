@@ -1,4 +1,4 @@
-using Domain.Entity;
+ï»¿using Domain.Entity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -11,13 +11,13 @@ namespace Infrastructure.Persistencia.Context.config
             builder.HasKey(type => type.Id);
             builder.Property(type => type.Name)
                 .IsRequired()
-                .HasMaxLength(100);
+                .HasMaxLength(25);
 
             builder.HasData(
                     new ProjectType { Id = 1, Name = "Mejora de Procesos" },
-                    new ProjectType { Id = 2, Name = "Innovación y Desarrollo" },
+                    new ProjectType { Id = 2, Name = "InnovaciÃ³n y Desarrollo" },
                     new ProjectType { Id = 3, Name = "Infraestructura" },
-                    new ProjectType { Id = 4, Name = "Capacitación Interna" }
+                    new ProjectType { Id = 4, Name = "CapacitaciÃ³n Interna" }
                     );
         }
     }

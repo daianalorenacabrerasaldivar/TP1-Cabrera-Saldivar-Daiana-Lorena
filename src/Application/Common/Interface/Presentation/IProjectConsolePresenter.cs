@@ -1,13 +1,13 @@
-﻿using Domain.Dto;
+﻿using Application.UseCase.ProjectProposals.Querys.FilterParameter;
+using Domain.Dto;
 using Domain.Entity;
 
 namespace Application.Common.Interface.Presentation
 {
     public interface IProjectConsolePresenter
     {
-        void ShowMenu();
         void ShowNewlyCreatedProjectDto(ProjectProposalResponse project);
-        void ShowProjectProposalDetails(ProjectProposal project);
-        void ShowProjectsSummary(List<ProjectProposal> projects);
+        void ShowProjectProposalDetails(ProjectProposalResponse project);
+        void ShowProjectsSummary(List<GetProjectResponse> projects);
     }
 }

@@ -56,7 +56,7 @@ namespace Application.UseCase.ProjectProposals.Querys.FilterParameter
         private static bool IsValidFilter(ProjectProposalFilter filter)
         {
             return !string.IsNullOrEmpty(filter.Title) ||
-                   filter.Status.HasValue ||
+                   filter.Status != null && filter.Status.Count > 0 ||
                    filter.Applicant.HasValue ||
                    filter.ApprovalUser.HasValue;
         }

@@ -1,4 +1,4 @@
-using Domain.Entity;
+﻿using Domain.Entity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -11,10 +11,10 @@ namespace Infrastructure.Persistencia.Context.config
             builder.HasKey(user => user.Id);
             builder.Property(user => user.Name)
                 .IsRequired()
-                .HasMaxLength(100);
+                .HasMaxLength(25);
             builder.Property(user => user.Email)
                 .IsRequired()
-                .HasMaxLength(200);
+                .HasMaxLength(100);
             builder.HasOne(u => u.ApproverRole)
                   .WithMany()
                   .HasForeignKey(u => u.Role)
@@ -27,7 +27,7 @@ namespace Infrastructure.Persistencia.Context.config
         public static void UserSeed(EntityTypeBuilder<User> builder)
         {
             builder.HasData(
-              new User { Id = 1, Name = "Jos� Ferreyra", Email = "jferreyra@unaj.com", Role = 2 },
+              new User { Id = 1, Name = "José Ferreyra", Email = "jferreyra@unaj.com", Role = 2 },
               new User { Id = 2, Name = "Ana Lucero", Email = "alucero@unaj.com", Role = 1 },
               new User { Id = 3, Name = "Gonzalo Molinas", Email = "gmolinas@unaj.com", Role = 2 },
               new User { Id = 4, Name = "Lucas Olivera", Email = "lolivera@unaj.com", Role = 3 },

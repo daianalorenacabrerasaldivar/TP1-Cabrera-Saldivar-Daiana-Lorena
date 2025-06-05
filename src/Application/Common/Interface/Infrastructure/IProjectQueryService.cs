@@ -1,4 +1,4 @@
-﻿namespace Infrastructure.Persistencia.Repositories.Query.Project
+﻿namespace Application.Common.Interface.Infrastructure
 {
     public interface IProjectQueryService
     {
