@@ -1,63 +1,53 @@
 ﻿using Application.Common.Interface.Presentation;
+using Consola.Menu.CommandMenu;
+using Consola.Menu.CommandMenu.ApproveProject;
+using Consola.Menu.CommandMenu.CreateProject;
+using Consola.Menu.CommandMenu.ShowProjects;
+using Consola.Menu.CommandMenu.UserSesion;
+using Microsoft.Extensions.DependencyInjection;
 
-public class MenuFactory
+namespace Consola.Menu
 {
-    //private readonly IRepositoryQuery _repositoryBase;
-    //private readonly IUserInteractionService _userInteractionService;
-    //private readonly IProjectConsolePresenter _projectConsolePresenter;
-    //private readonly IUserSessionService _userSessionService;
-    //private readonly ICreateProjectProposal _createProjectService;
-    //private readonly IProjectQueryService _projectQueryService;
-    //public MenuFactory(IRepositoryQuery repositoryBase,
-    //         IUserInteractionService userInteractionService,
-    //         IProjectConsolePresenter projectConsolePresenter,
-    //         IUserSessionService userSessionService,
-    //         ICreateProjectProposal createProjectService, IProjectQueryService projectQueryService)
-    //{
-    //    _repositoryBase = repositoryBase;
-    //    _userInteractionService = userInteractionService;
-    //    _projectConsolePresenter = projectConsolePresenter;
-    //    _userSessionService = userSessionService;
-    //    _createProjectService = createProjectService;
-    //    _projectQueryService = projectQueryService;
-    //}
+    /// <summary>
+    /// Fábrica responsable de crear y proporcionar los comandos del menú
+    /// </summary>
+    public class MenuFactory: IMenuFactory
+    {
+        private readonly IServiceProvider _serviceProvider;
 
+        public MenuFactory(IServiceProvider serviceProvider)
+        {
+            _serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
+        }
 
+        public List<IMenuOptionCommand> CreateMenuCommands()
+        {
+            return new List<IMenuOptionCommand>
+            {
+                _serviceProvider.GetRequiredService<CreateProjectConsoleAction>(),
+                _serviceProvider.GetRequiredService<ApproveProjectCommand>(),
+                _serviceProvider.GetRequiredService<ShowMyProjectsCommand>(),
+                _serviceProvider.GetRequiredService<ShowApprovedProjectsCommand>(),
+                _serviceProvider.GetRequiredService<ShowRejectedProjectsCommand>(),
+                _serviceProvider.GetRequiredService<UserSessionCommand>(),
+                _serviceProvider.GetRequiredService<ExitCommand>()
+            };
+        }
 
-    //public void dicionario()
-    //{
-    //    Dictionary Menu = new Dictionary<string, IMenuOptionCommand>
-    //{
-    //    { "1", new CreateProjectCommand(_repositoryBase, _userInteractionService, _projectConsolePresenter,_userSessionService,_createProjectService) },
-    //        { "2", new ApproveProjectCommand(_projectQueryService, _userInteractionService, _userSessionService) },
-    //{ "3", new ShowMyProjectsCommand(new ProjectQuery(_repositoryBase), _projectConsolePresenter, _userSessionService.GetActiveUser(), _projectSelectionService, _userInteractionService) },
-    //{ "4", new ShowApprovedProjectsCommand(_repositoryBase, _projectConsolePresenter) },
-    //{ "5", new ShowRejectedProjectsCommand(_repositoryBase, _projectConsolePresenter) },
-    //{ "6", new UserSessionCommand(_repositoryBase, _projectConsolePresenter) },
-    //{ "7", new ExitCommand(_projectConsolePresenter) }
-    //};
-    //}
+        public IMenuOptionCommand Login() { 
+            return _serviceProvider.GetRequiredService<UserSessionCommand>();
+        }
+        public Dictionary<string, IMenuOptionCommand> CreateMenuDictionary()
+        {
+            var commands = CreateMenuCommands();
+            var menuDict = new Dictionary<string, IMenuOptionCommand>();
 
-    //Dictionary<> menus= new Dictionary<string, MenuOption>
-    // {
-    //     { "1", new MenuOption {Description = "Crear un nuevo proyecto", Command = commands.OfType<CreateProjectCommand>().FirstOrDefault() } },
-    //     { "2", new MenuOption { Description = "Aprobar un proyecto", Command = commands.OfType<ApproveProjectCommand>().FirstOrDefault() } },
-    //     { "3", new MenuOption { Description = "Ver mis proyectos", Command = commands.OfType<ShowMyProjectsCommand>().FirstOrDefault() } },
-    //     { "4", new MenuOption { Description = "Ver proyectos aprobados", Command = commands.OfType<ShowApprovedProjectsCommand>().FirstOrDefault() } },
-    //     { "5", new MenuOption { Description = "Ver proyectos rechazados", Command = commands.OfType<ShowRejectedProjectsCommand>().FirstOrDefault() } },
-    //     { "6", new MenuOption { Description = "Cambiar de usuario", Command = commands.OfType<UserSessionCommand>().FirstOrDefault() } },
-    //     { "7", new MenuOption { Description = "Salir", Command = commands.OfType<ExitCommand>().FirstOrDefault() } }
-    // };
+            for (int i = 0; i < commands.Count; i++)
+            {
+                menuDict.Add((i + 1).ToString(), commands[i]);
+            }
 
-    Dictionary<string, IMenuOptionCommand> menus = new Dictionary<string, IMenuOptionCommand>();
-    //{ { "1", commands.OfType<CreateProjectCommand>().FirstOrDefault() } },
-
-    };
-    
-
-}
-public class MenuOption
-{
-    public string Description { get; set; }
-    public IMenuOptionCommand Command { get; set; }
+            return menuDict;
+        }
+    }
 }

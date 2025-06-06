@@ -63,6 +63,7 @@ namespace Infrastructure.Persistencia.Repositories.Query.Project
                 {
                     var approverUserStep = _repository.Query<User>()
                      .AsNoTracking()
+                     .Include(u => u.ApproverRole)
                      .FirstOrDefault(u => u.Id == filter.ApprovalUser);
 
                     if (approverUserStep != null)

@@ -5,8 +5,8 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Persistencia.Repositories.Query.Users
 {
-    public class UserQuery:IUserQuery
-    {   
+    public class UserQuery : IUserQuery
+    {
         private readonly IRepositoryQuery _repositoryQuery;
 
         public UserQuery(IRepositoryQuery dataBaseService)
@@ -29,7 +29,7 @@ namespace Infrastructure.Persistencia.Repositories.Query.Users
                 return new Failed<List<User>>("Ocurrio un error en el sistema, por favor intente m�s tarde");
             }
         }
-        public async Task<Result<User>> GetUserByEmail(string email)
+        public async Task<Result<User>> GetUserByEmailAsync(string email)
         {
             try
             {

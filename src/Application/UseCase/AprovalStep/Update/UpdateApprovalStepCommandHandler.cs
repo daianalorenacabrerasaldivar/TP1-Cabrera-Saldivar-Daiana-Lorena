@@ -3,8 +3,6 @@ using Application.Common.Interface.Infrastructure;
 using Application.Mapper;
 using Domain.Common;
 using Domain.Dto;
-using Domain.Entity;
-using Domain.Enum;
 using MediatR;
 using System.Net;
 
@@ -12,12 +10,12 @@ namespace Application.UseCase.AprovalStep.Update
 {
     public class UpdateApprovalStepCommandHandler : IRequestHandler<UpdateApprovalStepCommand, ResponseCodeAndObject<ProjectProposalResponse>>
     {
-        private readonly IRepositoryCommand _repositoryCommand;
+        private readonly IApprovalStepStatusUpdater _approvalStepStatusUpdater;
         private readonly IProjectApprovalStepUpdateValidator _projectValidatorCanUpdateStatus;
         private readonly IProjectProposalQuery _projectProposalQuery;
-        public UpdateApprovalStepCommandHandler(IRepositoryCommand repositoryCommand, IProjectProposalQuery projectTypeQuery, IProjectApprovalStepUpdateValidator projectValidatorCanUpdateStatus)
+        public UpdateApprovalStepCommandHandler(IApprovalStepStatusUpdater approvalStepStatusUpdater, IProjectProposalQuery projectTypeQuery, IProjectApprovalStepUpdateValidator projectValidatorCanUpdateStatus)
         {
-            _repositoryCommand = repositoryCommand;
+            _approvalStepStatusUpdater = approvalStepStatusUpdater;
             _projectProposalQuery = projectTypeQuery;
             _projectValidatorCanUpdateStatus = projectValidatorCanUpdateStatus;
         }
@@ -55,8 +53,8 @@ namespace Application.UseCase.AprovalStep.Update
                     Message = ApprovalStepResul.Info,
                     httpStatusCode = HttpStatusCode.Conflict
                 };
-   
-            var resultProject = await UpdateProposalAndStepAsync(projectProposalResult.Value, ApprovalStepResul.Value, request);
+
+            var resultProject = await _approvalStepStatusUpdater.UpdateProposalAndStepAsync(projectProposalResult.Value, ApprovalStepResul.Value, request);
 
             var mapper = MapperProposal.MapToProposalResponse(resultProject);
             return new ResponseCodeAndObject<ProjectProposalResponse>
@@ -65,33 +63,7 @@ namespace Application.UseCase.AprovalStep.Update
                 httpStatusCode = HttpStatusCode.OK,
             };
         }
-        private async Task<ProjectProposal> UpdateProposalAndStepAsync(ProjectProposal projectProposal,ProjectApprovalStep approvalStep, UpdateApprovalStepCommand request)
-        {
-           
-            approvalStep.Status = request.Status;
-            approvalStep.ApproverUserId = request.UserId;
-            approvalStep.Observations = request.Observation;
-            approvalStep.DecisionDate = DateTime.UtcNow;
 
-
-            if (request.Status == (int)StatusEnum.Rejected)
-            {
-                projectProposal.Status = (int)StatusEnum.Rejected;
-                _repositoryCommand.Update(projectProposal);
-            }
-            else if (AreAllStepsApproved(projectProposal))
-            {
-                projectProposal.Status = (int)StatusEnum.Approved;
-            }
-
-            var result = await _repositoryCommand.SaveAsync();
-            return projectProposal;
-        }
-
-        private bool AreAllStepsApproved(ProjectProposal project)
-        {
-            return project.ApprovalSteps.All(step => step.Status == (int)StatusEnum.Approved);
-        }
 
     }
 }

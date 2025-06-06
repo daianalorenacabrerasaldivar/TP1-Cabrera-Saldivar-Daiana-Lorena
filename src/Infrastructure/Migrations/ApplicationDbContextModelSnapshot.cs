@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
 
-namespace Infraestructure.Migrations
+namespace Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
     partial class ApplicationDbContextModelSnapshot : ModelSnapshot
@@ -17,7 +17,7 @@ namespace Infraestructure.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "9.0.4")
+                .HasAnnotation("ProductVersion", "9.0.5")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -212,7 +212,7 @@ namespace Infraestructure.Migrations
                         new
                         {
                             Id = 1,
-                            Name = "Líder de área"
+                            Name = "Líder de Área"
                         },
                         new
                         {
@@ -373,8 +373,8 @@ namespace Infraestructure.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasMaxLength(25)
+                        .HasColumnType("nvarchar(25)");
 
                     b.HasKey("Id");
 
@@ -413,13 +413,13 @@ namespace Infraestructure.Migrations
 
                     b.Property<string>("Email")
                         .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasMaxLength(25)
+                        .HasColumnType("nvarchar(25)");
 
                     b.Property<int>("Role")
                         .HasColumnType("int");
@@ -509,7 +509,7 @@ namespace Infraestructure.Migrations
                         .IsRequired();
 
                     b.HasOne("Domain.Entity.User", "ApproverUser")
-                        .WithMany()
+                        .WithMany("ProjectApprovalSteps")
                         .HasForeignKey("ApproverUserId");
 
                     b.HasOne("Domain.Entity.ProjectProposal", "ProjectProposal")
@@ -536,13 +536,13 @@ namespace Infraestructure.Migrations
             modelBuilder.Entity("Domain.Entity.ProjectProposal", b =>
                 {
                     b.HasOne("Domain.Entity.Area", "AreaEntity")
-                        .WithMany("ApproverRoles")
+                        .WithMany("ProjectProposals")
                         .HasForeignKey("Area")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("Domain.Entity.User", "User")
-                        .WithMany()
+                        .WithMany("ProjectProposals")
                         .HasForeignKey("CreateBy")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
@@ -597,7 +597,7 @@ namespace Infraestructure.Migrations
                 {
                     b.Navigation("ApprovalRules");
 
-                    b.Navigation("ApproverRoles");
+                    b.Navigation("ProjectProposals");
                 });
 
             modelBuilder.Entity("Domain.Entity.ProjectProposal", b =>
@@ -608,6 +608,13 @@ namespace Infraestructure.Migrations
             modelBuilder.Entity("Domain.Entity.ProjectType", b =>
                 {
                     b.Navigation("ApprovalRules");
+
+                    b.Navigation("ProjectProposals");
+                });
+
+            modelBuilder.Entity("Domain.Entity.User", b =>
+                {
+                    b.Navigation("ProjectApprovalSteps");
 
                     b.Navigation("ProjectProposals");
                 });

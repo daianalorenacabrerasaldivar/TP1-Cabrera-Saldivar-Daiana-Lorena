@@ -1,8 +1,6 @@
 ﻿using Application.Common.Interface.Infrastructure;
 using Domain.Dto;
-using Domain.Entity;
 using MediatR;
-using Microsoft.EntityFrameworkCore;
 
 namespace Application.UseCase.Users.Queries
 {

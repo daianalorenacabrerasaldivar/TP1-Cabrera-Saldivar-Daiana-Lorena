@@ -7,11 +7,11 @@ namespace Consola.PresentacionCommon
 {
     public class ProjectSelectionService : IProjectSelectionService
     {
-        private readonly IUserInteractionService _interactionService;
+        private readonly IConsoleUserInteractionService _interactionService;
         private readonly IProjectConsolePresenter _projectConsolePresenter;
         private readonly IMediator _mediator;
 
-        public ProjectSelectionService(IUserInteractionService userInteractionService, IProjectConsolePresenter projectConsolePresenter, IMediator mediator)
+        public ProjectSelectionService(IConsoleUserInteractionService userInteractionService, IProjectConsolePresenter projectConsolePresenter, IMediator mediator)
         {
             _interactionService = userInteractionService;
             _projectConsolePresenter = projectConsolePresenter;
@@ -30,14 +30,14 @@ namespace Consola.PresentacionCommon
 
             while (true)
             {
-                string option = _interactionService.GetInput("\n¿Desea ver un proyecto en detalle? (S/N)").ToUpper();
+                string selectOption = _interactionService.GetInput("\n¿Desea ver un proyecto en detalle? (S/N)").ToUpper();
 
-                if (option == "N")
+                if (selectOption == "N")
                 {
                     return Guid.Empty;
                 }
 
-                if (option != "S")
+                if (selectOption != "S")
                 {
                     _interactionService.ShowMessage("Opción inválida. Por favor, ingrese S o N.");
                     continue;
@@ -53,7 +53,6 @@ namespace Consola.PresentacionCommon
                 var projectDetail = await _mediator.Send(query);
                 _projectConsolePresenter.ShowProjectProposalDetails(projectDetail);
 
-                string selectOption = _interactionService.GetInput("¿Desea seleccionar este proyecto? (S/N)").ToUpper();
                 if (selectOption == "S")
                 {
                     return projectId;

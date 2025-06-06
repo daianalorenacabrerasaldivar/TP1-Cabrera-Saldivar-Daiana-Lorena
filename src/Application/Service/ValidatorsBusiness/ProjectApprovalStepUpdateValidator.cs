@@ -16,7 +16,7 @@ namespace Application.Service.ValidatorsBusiness
         }
         public async Task<Result<ProjectApprovalStep>> TryGetUpdatableApprovalStepAsync(ProjectProposal project, UpdateApprovalStepCommand request)
         {
-            bool projectIsModificable = IsProjectModifiable (project);
+            bool projectIsModificable = IsProjectModifiable(project);
             if (projectIsModificable == false)
             {
                 return new Failed<ProjectApprovalStep>("El proyecto no se encuentra en un estado que permite modificaciones");

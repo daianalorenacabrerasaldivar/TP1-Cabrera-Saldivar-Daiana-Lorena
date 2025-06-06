@@ -1,4 +1,5 @@
 ﻿using Application.Common.Exceptions;
+using Application.Common.Interface;
 using Application.Common.Interface.Presentation;
 using Application.UseCase.Areas.Queries;
 using Application.UseCase.ProjectProposals.Commands.Create;
@@ -12,13 +13,13 @@ namespace Consola.Menu.CommandMenu.CreateProject
     {
         public string Name => "Crear Proyecto";
 
-        private readonly IUserInteractionService _userInteractionService;
+        private readonly IConsoleUserInteractionService _userInteractionService;
         private readonly IProjectConsolePresenter _projectConsolePresenter;
         private readonly IUserSessionService _userSessionService;
         private readonly IMediator _mediator;
 
         public CreateProjectConsoleAction(
-            IUserInteractionService userInteractionService,
+            IConsoleUserInteractionService userInteractionService,
             IProjectConsolePresenter projectConsolePresenter,
             IUserSessionService userSessionService,
             IMediator mediator
@@ -134,10 +135,10 @@ namespace Consola.Menu.CommandMenu.CreateProject
             if (types?.Count < 1)
                 throw new CustomResponseException("No hay tipos de proyecto disponibles");
 
-            string message = "\nSeleccione el tipo de proyecto:";
+            string message = "\nSeleccione el tipo de proyecto:\n";
             for (int i = 0; i < types.Count; i++)
             {
-                message += $"{i + 1}. {types[i].Name}";
+                message += $"{i + 1}. {types[i].Name}\n";
             }
 
             int typeIndex = _userInteractionService.GetValidatedIntegerMaxMin(message, 1, types.Count);

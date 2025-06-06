@@ -1,4 +1,5 @@
-﻿using Application.Common.Interface.Presentation;
+﻿using Application.Common.Interface;
+using Application.Common.Interface.Presentation;
 using Application.UseCase.AprovalStep.Update;
 using Application.UseCase.ProjectProposals.Querys.FilterParameter;
 using Domain.Enum;
@@ -12,28 +13,28 @@ namespace Consola.Menu.CommandMenu.ApproveProject
         public string Name => "Aprobar un proyecto";
 
         private readonly IProjectConsolePresenter _consolePresenter;
-        private readonly IUserInteractionService _userInteractionService;
+        private readonly IConsoleUserInteractionService _userInteractionService;
         private readonly IUserSessionService _userSessionService;
         private readonly IProjectSelectionService _projectSelectionService;
         private readonly IMediator _mediator;
 
         public ApproveProjectCommand(
             IProjectConsolePresenter consolePresenter,
-            IUserInteractionService userInteractionService,
+            IConsoleUserInteractionService userInteractionService,
             IUserSessionService userSessionService,
             IMediator mediator,
             IProjectSelectionService projectSelectionService)
         {
-            _consolePresenter = consolePresenter ?? throw new ArgumentNullException(nameof(consolePresenter));
-            _userInteractionService = userInteractionService ?? throw new ArgumentNullException(nameof(userInteractionService));
-            _userSessionService = userSessionService ?? throw new ArgumentNullException(nameof(userSessionService));
-            _projectSelectionService = projectSelectionService ?? throw new ArgumentNullException(nameof(projectSelectionService));
-            _mediator = mediator ?? throw new ArgumentNullException(nameof(mediator));
+            _consolePresenter = consolePresenter ;
+            _userInteractionService = userInteractionService;
+            _userSessionService = userSessionService;
+            _projectSelectionService = projectSelectionService;
+            _mediator = mediator;
         }
 
         public async Task ExecuteAsync()
         {
-            
+
             var pendingProjects = await GetPendingProjectsForApprovalAsync();
             if (pendingProjects == null || !pendingProjects.Any())
             {
@@ -42,7 +43,7 @@ namespace Consola.Menu.CommandMenu.ApproveProject
             }
 
             _userInteractionService.ShowMessage("Seleccione un proyecto para aprobar o rechazar:");
-            _consolePresenter.ShowProjectsSummary(pendingProjects);
+
 
             var selectedProject = await _projectSelectionService.SelectProjectAsync(pendingProjects);
             if (selectedProject == Guid.Empty)
@@ -50,7 +51,7 @@ namespace Consola.Menu.CommandMenu.ApproveProject
                 return;
             }
 
-           
+
             int newStatus = GetNewStatus();
             if (newStatus == 0)
             {

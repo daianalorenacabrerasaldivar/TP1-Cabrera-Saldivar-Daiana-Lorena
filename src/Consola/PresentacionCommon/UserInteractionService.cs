@@ -1,6 +1,7 @@
 ﻿using Application.Common.Interface.Presentation;
+using System;
 
-public class ConsoleUserInteractionService : IUserInteractionService
+public class ConsoleUserInteractionService : IConsoleUserInteractionService
 {
     public string GetInput(string message)
     {
@@ -47,5 +48,15 @@ public class ConsoleUserInteractionService : IUserInteractionService
             break;
         } while (true);
         return result;
+    }
+
+    public void ShowCustomBar()
+    {
+        Console.WriteLine("\n===============================================\n");
+    }
+
+    public void ConleClear()
+    {
+        Console.Clear();
     }
 }

@@ -1,9 +1,7 @@
 ﻿using Application.Common.Interface.Infrastructure;
 using Application.Mapper;
 using Domain.Dto;
-using Domain.Entity;
 using MediatR;
-using Microsoft.EntityFrameworkCore;
 
 namespace Application.UseCase.ProjectProposals.Querys.ProjectById
 {

@@ -6,8 +6,8 @@ namespace Consola.Menu.CommandMenu
     {
         public string Name => "Salir";
 
-        IUserInteractionService _consoleDisplay;
-        public ExitCommand(IUserInteractionService consoleDisplay)
+        IConsoleUserInteractionService _consoleDisplay;
+        public ExitCommand(IConsoleUserInteractionService consoleDisplay)
         {
             _consoleDisplay = consoleDisplay;
         }

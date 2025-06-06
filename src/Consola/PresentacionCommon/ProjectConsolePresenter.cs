@@ -1,16 +1,14 @@
 ﻿using Application.Common.Interface.Presentation;
 using Application.UseCase.ProjectProposals.Querys.FilterParameter;
-using Consola.Helpers;
 using Domain.Dto;
-using Domain.Entity;
 
 namespace Consola.PresentacionCommon
 {
     public class ProjectConsolePresenter : IProjectConsolePresenter
     {
-        private readonly IUserInteractionService _userInteractionService;
+        private readonly IConsoleUserInteractionService _userInteractionService;
 
-        public ProjectConsolePresenter(IUserInteractionService userInteractionService)
+        public ProjectConsolePresenter(IConsoleUserInteractionService userInteractionService)
         {
             _userInteractionService = userInteractionService;
         }
@@ -34,9 +32,9 @@ namespace Consola.PresentacionCommon
                 return;
             }
 
-            _userInteractionService.ShowMessage("===============================================");
+            _userInteractionService.ShowCustomBar();
             _userInteractionService.ShowMessage("LISTADO DE PROYECTOS");
-            _userInteractionService.ShowMessage("===============================================");
+            _userInteractionService.ShowCustomBar();
 
             int index = 1;
             foreach (var project in projects)
@@ -51,17 +49,17 @@ namespace Consola.PresentacionCommon
                 Console.Write($" Área: {areaName} . ");
                 Console.Write($" Monto estimado: ${project.Amount:N2}");
                 Console.Write($" Duración estimada: {project.Duration} días");
-                _userInteractionService.ShowMessage("-----------------------------------------------");
+                _userInteractionService.ShowMessage("\n-----------------------------------------------");
                 index++;
             }
 
-            _userInteractionService.ShowMessage("===============================================");
+            _userInteractionService.ShowCustomBar();
             _userInteractionService.ShowMessage($"Total de proyectos: {projects.Count}");
-            _userInteractionService.ShowMessage("===============================================");
+            _userInteractionService.ShowCustomBar();
         }
         public void ShowProjectProposalDetails(ProjectProposalResponse project)
         {
-            _userInteractionService.ShowMessage("===============================================");
+            _userInteractionService.ShowCustomBar();
             _userInteractionService.ShowMessage($"Nombre: {project.Title}");
             _userInteractionService.ShowMessage($"Descripción: {project.Description}");
             _userInteractionService.ShowMessage($"Solicitante: {project.User?.Name ?? "No especificado"}");

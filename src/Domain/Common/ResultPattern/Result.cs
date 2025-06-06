@@ -6,7 +6,7 @@
 
         protected abstract DataStatus DataStatus { get; }
 
-        public bool hasValue => DataStatus == DataStatus.Ok && Value != null;
+        public bool HasValue => DataStatus == DataStatus.Ok && Value != null;
 
         public bool IsFailed => DataStatus == DataStatus.Failed;
 

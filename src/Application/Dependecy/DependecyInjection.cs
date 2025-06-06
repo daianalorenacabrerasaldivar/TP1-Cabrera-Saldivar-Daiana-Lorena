@@ -1,4 +1,5 @@
 ﻿using Application.Common.Interface;
+using Application.Common.Presentation;
 using Application.Service.ProjectProposals;
 using Application.Service.ValidatorsBusiness;
 using FluentValidation;
@@ -18,7 +19,7 @@ namespace Application.Dependecy
             services.AddScoped<ICreateProjectProposalService, CreateProjectProposalService>();
             services.AddScoped<IApprovalAssignmentService, ProjectApprovalAssignmentRuleService>();
             services.AddScoped<IProjectApprovalStepUpdateValidator, ProjectApprovalStepUpdateValidator>();
-            services.AddScoped<IProjectProposalBusinessValidator, ProjectProposalBusinessValidator>();
+            services.AddSingleton<IUserSessionService, UserSessionService>();
         }
     }
 }
