@@ -49,7 +49,6 @@ namespace Consola.Menu.CommandMenu.ApproveProject
 
             _userInteractionService.ShowMessage("Seleccione un proyecto para aprobar o rechazar:");
 
-
             var selectedProject = await _projectSelectionService.SelectProjectAsync(pendingProjects);
             if (selectedProject == Guid.Empty)
             {

@@ -65,7 +65,6 @@ namespace Consola.Menu.CommandMenu.ShowProjects
                 }
 
                 _userInteractionService.ShowMessage($"Tienes {myProjects.Count} proyecto(s):");
-                _projectConsolePresenter.ShowProjectsSummary(myProjects);
 
                 var selectedProjectId = await _projectSelectionService.SelectProjectAsync(myProjects);
 
