@@ -20,7 +20,7 @@ namespace Consola.Menu
         public async Task RunMenuAsync()
         {
             var userLogin = _menuFactory.Login();
-             await  userLogin.ExecuteAsync();
+            await userLogin.ExecuteAsync();
             while (true)
             {
                 DisplayMenu();

@@ -2,21 +2,19 @@
 using Application.Mapper;
 using Domain.Common;
 using Domain.Dto;
-using Domain.Entity;
 using Domain.Enum;
 using MediatR;
-using Microsoft.EntityFrameworkCore;
 
 namespace Application.UseCase.ProjectProposals.Commands.Update
 {
     public class ProjectUpdateCommandHandler : IRequestHandler<ProjectUpdateCommand, ResponseCodeAndObject<ProjectProposalResponse>>
     {
         private readonly IRepositoryCommand _repositoryCommand;
-        private readonly IRepositoryQuery _repositoryQuery;
-        public ProjectUpdateCommandHandler(IRepositoryCommand repositoryCommand, IRepositoryQuery repositoryQuery)
+        private readonly IProjectProposalQuery _projectProposalQuery;
+        public ProjectUpdateCommandHandler(IRepositoryCommand repositoryCommand, IProjectProposalQuery projectProposalQuery)
         {
             _repositoryCommand = repositoryCommand;
-            _repositoryQuery = repositoryQuery;
+            _projectProposalQuery = projectProposalQuery;
         }
 
         public async Task<ResponseCodeAndObject<ProjectProposalResponse>> Handle(ProjectUpdateCommand request, CancellationToken cancellationToken)
@@ -25,8 +23,8 @@ namespace Application.UseCase.ProjectProposals.Commands.Update
             {
                 throw new ArgumentException("Datos del proyecto inválidos");
             }
-            var project = _repositoryQuery.Query<ProjectProposal>()
-                 .FirstOrDefault(x => x.Id == request.ProjectId);
+            var projectResul = await _projectProposalQuery.GetProjectProposalByIdAsync(request.ProjectId);
+            var project = projectResul.Value;
             if (project == null)
             {
                 throw new ArgumentException("Proyecto no encontrado");
@@ -57,19 +55,9 @@ namespace Application.UseCase.ProjectProposals.Commands.Update
             {
                 throw new Exception("Error al actualizar el proyecto");
             }
-            project = _repositoryQuery.Query<ProjectProposal>()
-            .Include(x => x.AreaEntity)
-            .Include(x => x.TypeEntity)
-            .Include(x => x.ApprovalSteps)
-                .ThenInclude(step => step.ApproverUser)
-            .Include(x => x.ApprovalSteps)
-                .ThenInclude(step => step.ApproverRole)
-            .Include(x => x.ApprovalSteps)
-                .ThenInclude(step => step.ApprovalStatus)
-            .Include(x => x.ApprovalStatus)
-            .Include(x => x.User)
-            .FirstOrDefault(x => x.Id == request.ProjectId);
-            var response = MapperProposal.MapToProposalResponse(project);
+
+            var projectActualizado = await _projectProposalQuery.GetProjectProposalByIdAsync(request.ProjectId);
+            var response = MapperProposal.MapToProposalResponse(projectActualizado);
             return new ResponseCodeAndObject<ProjectProposalResponse> { Response = response };
 
         }

@@ -1,5 +1,4 @@
 ﻿using Application.Common.Interface.Presentation;
-using System;
 
 public class ConsoleUserInteractionService : IConsoleUserInteractionService
 {

@@ -1,6 +1,7 @@
 ﻿using Application.Common.Interface;
 using Application.Common.Presentation;
 using Application.Service.ProjectProposals;
+using Application.Service.StatusProjectAndStep;
 using Application.Service.ValidatorsBusiness;
 using FluentValidation;
 using Microsoft.Extensions.DependencyInjection;
@@ -15,10 +16,11 @@ namespace Application.Dependecy
             services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
 
             services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()));
-
+            services.AddScoped<IApprovalStepStatusUpdater, ApprovalStepStatusUpdater>();
             services.AddScoped<ICreateProjectProposalService, CreateProjectProposalService>();
             services.AddScoped<IApprovalAssignmentService, ProjectApprovalAssignmentRuleService>();
             services.AddScoped<IProjectApprovalStepUpdateValidator, ProjectApprovalStepUpdateValidator>();
+            services.AddScoped<IGetProjectApprovalStep, GetProjectApprovalStep>();
             services.AddSingleton<IUserSessionService, UserSessionService>();
         }
     }

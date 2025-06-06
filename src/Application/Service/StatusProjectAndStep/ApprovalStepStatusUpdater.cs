@@ -6,9 +6,13 @@ using Domain.Enum;
 
 namespace Application.Service.StatusProjectAndStep
 {
-    public class ProjectApprovalStatusUpdater : IApprovalStepStatusUpdater
+    public class ApprovalStepStatusUpdater : IApprovalStepStatusUpdater
     {
         private readonly IRepositoryCommand _repositoryCommand;
+        public ApprovalStepStatusUpdater(IRepositoryCommand repositoryCommand)
+        {
+            _repositoryCommand = repositoryCommand;
+        }
         public async Task<ProjectProposal> UpdateProposalAndStepAsync(ProjectProposal projectProposal, ProjectApprovalStep approvalStep, UpdateApprovalStepCommand request)
         {
 
@@ -26,8 +30,9 @@ namespace Application.Service.StatusProjectAndStep
             else if (AreAllStepsApproved(projectProposal))
             {
                 projectProposal.Status = (int)StatusEnum.Approved;
+                _repositoryCommand.Update<ProjectProposal>(projectProposal);
             }
-
+            _repositoryCommand.Update<ProjectApprovalStep>(approvalStep);
             var result = await _repositoryCommand.SaveAsync();
             return projectProposal;
         }

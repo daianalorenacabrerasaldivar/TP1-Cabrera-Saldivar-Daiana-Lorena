@@ -11,7 +11,7 @@ namespace Consola.Menu
     /// <summary>
     /// Fábrica responsable de crear y proporcionar los comandos del menú
     /// </summary>
-    public class MenuFactory: IMenuFactory
+    public class MenuFactory : IMenuFactory
     {
         private readonly IServiceProvider _serviceProvider;
 
@@ -34,7 +34,8 @@ namespace Consola.Menu
             };
         }
 
-        public IMenuOptionCommand Login() { 
+        public IMenuOptionCommand Login()
+        {
             return _serviceProvider.GetRequiredService<UserSessionCommand>();
         }
         public Dictionary<string, IMenuOptionCommand> CreateMenuDictionary()

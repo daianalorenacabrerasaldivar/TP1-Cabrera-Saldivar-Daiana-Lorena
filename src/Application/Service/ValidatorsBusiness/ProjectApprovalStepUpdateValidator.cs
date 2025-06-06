@@ -10,9 +10,11 @@ namespace Application.Service.ValidatorsBusiness
     public class ProjectApprovalStepUpdateValidator : IProjectApprovalStepUpdateValidator
     {
         private readonly IUserQuery _userQuery;
-        public ProjectApprovalStepUpdateValidator(IUserQuery userQuery)
+        private readonly IGetProjectApprovalStep _getProjectApprovalStep;
+        public ProjectApprovalStepUpdateValidator(IUserQuery userQuery, IGetProjectApprovalStep getProjectApprovalStep)
         {
             _userQuery = userQuery;
+            _getProjectApprovalStep = getProjectApprovalStep;
         }
         public async Task<Result<ProjectApprovalStep>> TryGetUpdatableApprovalStepAsync(ProjectProposal project, UpdateApprovalStepCommand request)
         {
@@ -26,13 +28,16 @@ namespace Application.Service.ValidatorsBusiness
             {
                 return new Failed<ProjectApprovalStep>(userResult.Info);
             }
-
-            var approvalStep = FindApplicableApprovalStep(project, request.UserId, userResult.Value.Id);
+            var user = userResult.Value;
+            var approvalStep = _getProjectApprovalStep.FindApplicableApprovalStep(project, request.UserId, user.Role, request.StepId);
             if (approvalStep == null)
             {
                 return new Failed<ProjectApprovalStep>("No se encontro un paso de aprobacion valido para el usuario");
             }
-
+            else if (approvalStep.Id != request.StepId)
+            {
+                return new Failed<ProjectApprovalStep>("El paso de aprobacion no es modificable.");
+            }
             return new Success<ProjectApprovalStep>(approvalStep);
 
         }
@@ -57,19 +62,6 @@ namespace Application.Service.ValidatorsBusiness
             return new Success<User>(userResult.Value);
         }
 
-        private static ProjectApprovalStep FindApplicableApprovalStep(
-            ProjectProposal project,
-            int userId,
-            int userRoleId)
-        {
-            return project.ApprovalSteps
-                .Where(step =>
-                    (step.Status == (int)StatusEnum.Pending || step.Status == (int)StatusEnum.Observed) &&
-                    (step.ApproverUserId == userId ||
-                     (step.ApproverUserId == null && step.ApproverRoleId == userRoleId))
-                )
-                .OrderBy(step => step.StepOrder)
-                .FirstOrDefault();
-        }
+
     }
 }

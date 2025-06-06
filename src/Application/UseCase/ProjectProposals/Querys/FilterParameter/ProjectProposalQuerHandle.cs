@@ -2,7 +2,6 @@
 using Application.Mapper;
 using Domain.Common.ResultPattern;
 using MediatR;
-using Microsoft.Extensions.Logging;
 
 namespace Application.UseCase.ProjectProposals.Querys.FilterParameter
 {

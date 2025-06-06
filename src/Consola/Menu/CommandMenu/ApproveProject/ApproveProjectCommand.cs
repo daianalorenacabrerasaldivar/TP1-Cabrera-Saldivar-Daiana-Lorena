@@ -2,6 +2,7 @@
 using Application.Common.Interface.Presentation;
 using Application.UseCase.AprovalStep.Update;
 using Application.UseCase.ProjectProposals.Querys.FilterParameter;
+using Application.UseCase.ProjectProposals.Querys.ProjectById;
 using Domain.Enum;
 using MediatR;
 
@@ -16,6 +17,7 @@ namespace Consola.Menu.CommandMenu.ApproveProject
         private readonly IConsoleUserInteractionService _userInteractionService;
         private readonly IUserSessionService _userSessionService;
         private readonly IProjectSelectionService _projectSelectionService;
+        private readonly IGetProjectApprovalStep _getProjectApprovalStep;
         private readonly IMediator _mediator;
 
         public ApproveProjectCommand(
@@ -23,13 +25,16 @@ namespace Consola.Menu.CommandMenu.ApproveProject
             IConsoleUserInteractionService userInteractionService,
             IUserSessionService userSessionService,
             IMediator mediator,
-            IProjectSelectionService projectSelectionService)
+            IProjectSelectionService projectSelectionService,
+            IGetProjectApprovalStep getProjectApprovalStep)
         {
-            _consolePresenter = consolePresenter ;
+            _consolePresenter = consolePresenter;
             _userInteractionService = userInteractionService;
             _userSessionService = userSessionService;
             _projectSelectionService = projectSelectionService;
+
             _mediator = mediator;
+            _getProjectApprovalStep = getProjectApprovalStep;
         }
 
         public async Task ExecuteAsync()
@@ -51,7 +56,6 @@ namespace Consola.Menu.CommandMenu.ApproveProject
                 return;
             }
 
-
             int newStatus = GetNewStatus();
             if (newStatus == 0)
             {
@@ -70,8 +74,6 @@ namespace Consola.Menu.CommandMenu.ApproveProject
 
         private async Task<List<GetProjectResponse>> GetPendingProjectsForApprovalAsync()
         {
-            _userInteractionService.ShowMessage("Buscando proyectos pendientes de aprobación...");
-
             var filter = new ProjectProposalFilter
             {
                 Status = new List<int> { (int)StatusEnum.Pending, (int)StatusEnum.Observed },
@@ -91,12 +93,16 @@ namespace Consola.Menu.CommandMenu.ApproveProject
 
         private async Task<bool> UpdateProjectStatusAsync(Guid projectId, int status, string observation)
         {
+            var project = await _mediator.Send(new GetProjectByIdQuery { Id = projectId });
+            var activeUser = _userSessionService.GetActiveUser();
+            var steptResult = _getProjectApprovalStep.FindApplicableApprovalStepDto(project, activeUser.Id, activeUser.Role);
             var command = new UpdateApprovalStepCommand
             {
                 ProjectId = projectId,
-                UserId = _userSessionService.GetActiveUser().Id,
+                UserId = activeUser.Id,
                 Status = status,
-                Observation = observation
+                StepId = steptResult.Id,
+                Observation= observation
             };
 
             try
